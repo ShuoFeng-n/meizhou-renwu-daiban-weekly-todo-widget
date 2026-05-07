@@ -46,8 +46,8 @@ git --version
 克隆仓库：
 
 ```powershell
-git clone https://github.com/<your-name>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/ShuoFeng-n/weekly-todo-widget.git
+cd weekly-todo-widget
 ```
 
 安装依赖：

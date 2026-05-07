@@ -46,8 +46,8 @@ git --version
 克隆仓库：
 
 ```powershell
-git clone https://github.com/ShuoFeng-n/weekly-todo-widget.git
-cd weekly-todo-widget
+git clone https://github.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget.git
+cd meizhou-renwu-daiban-weekly-todo-widget
 ```
 
 安装依赖：
@@ -238,8 +238,8 @@ git --version
 Clone the repository:
 
 ```powershell
-git clone https://github.com/ShuoFeng-n/weekly-todo-widget.git
-cd weekly-todo-widget
+git clone https://github.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget.git
+cd meizhou-renwu-daiban-weekly-todo-widget
 ```
 
 Install dependencies:

@@ -1,39 +1,39 @@
 # 每周任务代办透明桌面小组件
 
-一个用 HTML + Electron 做出来的 Windows 透明桌面待办小组件。它起源于一次 vibecoding：从“我想把每周任务放到桌面上”开始，一步步做成了可拖动、可编辑、可勾选的透明桌面挂件。
+一个用 **HTML + Electron** 做出来的 Windows 透明桌面待办小组件。
+
+它来自一次 vibecoding：从“我想把每周任务直接放到桌面上”开始，一步步做成了可以添加、勾选、编辑、拖拽排序的透明桌面挂件。
 
 ![预览](assets/preview.png)
 
 ## 功能
 
-- 透明无边框桌面窗口，更像桌面组件而不是普通网页。
-- 周一到周日一屏展示，适合每周计划。
+- 透明无边框桌面窗口，更像桌面组件，而不是普通网页。
+- 周一到周日一屏展示，适合做每周计划。
 - 添加任务、勾选完成、删除任务。
 - 点击铅笔或双击任务文字即可行内编辑。
-- 编辑内容默认自动保存。
+- 修改内容会自动保存。
 - 同一天内拖动任务，可以交换顺序。
-- 一键导出文本。
-- 清除已完成、清空本周。
+- 一键导出本周任务文本。
+- 支持清除已完成、清空本周。
 - 支持置顶、最小化、关闭窗口。
-- 数据保存在本机浏览器/Electron 本地存储里，不需要账号。
+- 数据保存在本机，不需要账号。
 
 ## 适合谁
 
-适合想把轻量计划直接放在桌面上的人：
-
-- 每周任务计划
-- 学习/工作待办
-- 桌面备忘
-- vibecoding 小作品展示
+- 想把每周计划直接放在桌面上的人
+- 想要一个轻量待办挂件的人
+- 想展示 vibecoding 小作品的人
+- 想学习 HTML + Electron 桌面小工具的人
 
 ## 环境要求
 
-- Windows 10 或 Windows 11
+- Windows 10 / Windows 11
 - Node.js 18 或更高版本
 - npm
-- Git（如果你要从 GitHub 克隆）
+- Git
 
-查看是否已安装：
+检查本机是否已安装：
 
 ```powershell
 node --version
@@ -71,7 +71,7 @@ npm start
 .\start-widget.ps1
 ```
 
-第一次运行时，如果还没有安装依赖，脚本会自动执行 `npm install`。
+如果依赖还没有安装，`start-widget.ps1` 会先自动执行 `npm install`。
 
 ## 创建桌面快捷方式
 
@@ -81,13 +81,13 @@ npm start
 .\install-desktop-shortcut.ps1
 ```
 
-脚本会在桌面创建：
+运行后，桌面会出现：
 
 ```text
 每周任务代办-透明小组件.lnk
 ```
 
-以后双击这个快捷方式就能打开透明小组件。
+以后双击这个快捷方式就能打开小组件。
 
 ## 使用方法
 
@@ -135,8 +135,8 @@ npm start
 
 - 不需要注册账号。
 - 不会自动上传到云端。
-- 换浏览器/换电脑不会自动同步。
-- 清理 Electron 或浏览器应用数据时，任务可能被清除。
+- 换浏览器或换电脑不会自动同步。
+- 如果清理 Electron 或浏览器应用数据，任务可能会被清除。
 
 ## 项目结构
 
@@ -150,6 +150,8 @@ npm start
 │  └─ package-lock.json
 ├─ start-widget.ps1              # 从项目根目录启动小组件
 ├─ install-desktop-shortcut.ps1   # 创建桌面快捷方式
+├─ assets/
+│  └─ preview.png                # README 预览图
 ├─ README.md
 └─ LICENSE
 ```
@@ -164,13 +166,13 @@ npm start --prefix weekly-widget
 
 如果窗口已经打开，关闭后再启动即可看到新效果。
 
-Electron 默认优先加载桌面上的 `每周任务代办.html`，如果找不到，就加载项目里的 `weekly-todo.html`。
+Electron 默认优先加载桌面上的 `每周任务代办.html`；如果找不到，就加载项目里的 `weekly-todo.html`。
 
 ## 常见问题
 
-### 为什么不是普通网页？
+### 为什么不用普通浏览器打开？
 
-普通浏览器窗口无法真正做到透明桌面组件效果。这个项目用 Electron 创建透明、无边框窗口，再加载 HTML 页面，所以看起来更像桌面挂件。
+普通浏览器窗口很难做到真正透明桌面组件效果。这个项目用 Electron 创建透明、无边框窗口，再加载 HTML 页面，所以看起来更像桌面挂件。
 
 ### 为什么没有账号同步？
 
@@ -188,6 +190,171 @@ Electron 默认优先加载桌面上的 `每周任务代办.html`，如果找不
 - 增加主题颜色
 - 支持按周归档
 - 支持备份/导入 JSON
+
+## License
+
+MIT
+
+---
+
+# Weekly Todo Transparent Desktop Widget
+
+A transparent Windows desktop todo widget built with **HTML + Electron**.
+
+This project started as a vibecoding experiment: “What if my weekly tasks could live directly on my desktop?” It gradually became a lightweight widget where you can add, check, edit, delete, and reorder weekly tasks.
+
+![Preview](assets/preview.png)
+
+## Features
+
+- Transparent frameless desktop window.
+- Weekly layout from Monday to Sunday.
+- Add, check, edit, and delete tasks.
+- Inline editing by clicking the pencil button or double-clicking task text.
+- Edits are saved automatically.
+- Drag tasks within the same day to swap order.
+- Export the weekly todo list as plain text.
+- Clear completed tasks or reset the whole week.
+- Pin, minimize, or close the widget window.
+- Local-only storage. No account required.
+
+## Requirements
+
+- Windows 10 / Windows 11
+- Node.js 18+
+- npm
+- Git
+
+Check your environment:
+
+```powershell
+node --version
+npm --version
+git --version
+```
+
+## Installation
+
+Clone the repository:
+
+```powershell
+git clone https://github.com/ShuoFeng-n/weekly-todo-widget.git
+cd weekly-todo-widget
+```
+
+Install dependencies:
+
+```powershell
+cd weekly-widget
+npm install
+```
+
+## Run
+
+Inside `weekly-widget`:
+
+```powershell
+npm start
+```
+
+Or run from the project root:
+
+```powershell
+.\start-widget.ps1
+```
+
+If dependencies are missing, `start-widget.ps1` will run `npm install` first.
+
+## Create Desktop Shortcut
+
+From the project root:
+
+```powershell
+.\install-desktop-shortcut.ps1
+```
+
+It creates this shortcut on your desktop:
+
+```text
+每周任务代办-透明小组件.lnk
+```
+
+Double-click it to open the widget later.
+
+## Usage
+
+### Add a Task
+
+Type a task in the top input, choose a weekday, then click “添加”.
+
+### Complete a Task
+
+Click the checkbox on the left side of a task.
+
+### Edit a Task
+
+Click the pencil button or double-click the task text. The task turns into an input field. Edits are saved automatically. Press `Enter` or click outside to exit editing mode.
+
+### Reorder Tasks
+
+Within the same day, drag one task onto another task to swap their positions.
+
+### Export Tasks
+
+Click “导出” to copy the weekly list to your clipboard.
+
+### Clean Up
+
+- “清除完成”: remove completed tasks.
+- “清空”: clear all tasks after confirmation.
+
+## Data Storage
+
+Tasks are stored locally with `localStorage`.
+
+That means:
+
+- No login is required.
+- Data is not uploaded to the cloud.
+- Data will not automatically sync across devices.
+- Clearing Electron/browser app data may remove your tasks.
+
+## Project Structure
+
+```text
+.
+├─ weekly-todo.html
+├─ weekly-widget/
+│  ├─ main.js
+│  ├─ preload.js
+│  ├─ package.json
+│  └─ package-lock.json
+├─ start-widget.ps1
+├─ install-desktop-shortcut.ps1
+├─ assets/
+│  └─ preview.png
+├─ README.md
+└─ LICENSE
+```
+
+## Development
+
+After editing `weekly-todo.html`, restart the widget:
+
+```powershell
+npm start --prefix weekly-widget
+```
+
+Electron first tries to load `每周任务代办.html` from the desktop. If it does not exist, it loads the local `weekly-todo.html` from this repository.
+
+## Roadmap Ideas
+
+- Package as `.exe`
+- Add auto-start on boot
+- Remember window position
+- Add themes
+- Add weekly archive
+- Add JSON backup/import
 
 ## License
 

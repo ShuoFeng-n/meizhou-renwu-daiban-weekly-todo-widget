@@ -1,0 +1,12 @@
+node_modules/
+npm-debug.log*
+*.log
+
+# Local screenshots generated while polishing the widget.
+weekly-widget-preview*.png
+
+# OS/editor noise.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

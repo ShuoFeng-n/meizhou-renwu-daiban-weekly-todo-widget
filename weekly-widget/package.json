@@ -1,0 +1,13 @@
+{
+  "name": "weekly-todo-widget",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Transparent desktop widget wrapper for weekly todo HTML.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^37.2.6"
+  }
+}

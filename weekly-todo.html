@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>每周任务代办</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: transparent;
+      --ink: #181b20;
+      --muted: #66707d;
+      --quiet: #8b95a3;
+      --line: rgba(38, 45, 55, 0.13);
+      --line-strong: rgba(255, 255, 255, 0.72);
+      --glass: rgba(255, 255, 255, 0.58);
+      --glass-strong: rgba(255, 255, 255, 0.78);
+      --task-bg: rgba(255, 255, 255, 0.66);
+      --accent: #24776c;
+      --accent-2: #c2566d;
+      --done: #8a929c;
+      --shadow: 0 24px 70px rgba(18, 24, 32, 0.20);
+      --soft-shadow: 0 10px 26px rgba(18, 24, 32, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      background: transparent;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      overflow: auto;
+      -webkit-app-region: no-drag;
+    }
+
+    body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    body::-webkit-scrollbar-thumb {
+      background: rgba(78, 86, 98, 0.28);
+      border-radius: 999px;
+    }
+
+    .app {
+      width: min(860px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 14px 0 18px;
+    }
+
+    body.electron-widget .app {
+      width: 100%;
+      padding: 12px;
+    }
+
+    header,
+    .panel,
+    .day {
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.46)),
+        var(--glass);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px) saturate(1.22);
+      -webkit-backdrop-filter: blur(18px) saturate(1.22);
+    }
+
+    header {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      min-height: 118px;
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      overflow: hidden;
+      -webkit-app-region: drag;
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      inset: auto 18px 0;
+      height: 3px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #24776c, #d18442, #496fb8, #bd566d);
+      opacity: 0.9;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.05;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .week {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      max-width: 305px;
+      -webkit-app-region: no-drag;
+    }
+
+    .desktop-window-controls {
+      display: none;
+      gap: 7px;
+      width: 100%;
+      justify-content: flex-end;
+      margin-bottom: 2px;
+    }
+
+    body.electron-widget .desktop-window-controls {
+      display: flex;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+      -webkit-app-region: no-drag;
+    }
+
+    button {
+      border: 1px solid rgba(42, 49, 60, 0.14);
+      background: rgba(255, 255, 255, 0.56);
+      color: var(--ink);
+      border-radius: 999px;
+      min-height: 34px;
+      padding: 0 12px;
+      cursor: pointer;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+      transition: transform 130ms ease, background 130ms ease, border-color 130ms ease;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.78);
+      border-color: rgba(42, 49, 60, 0.22);
+      transform: translateY(-1px);
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: rgba(22, 95, 85, 0.32);
+      color: white;
+      box-shadow: 0 10px 24px rgba(36, 119, 108, 0.22);
+    }
+
+    button.danger {
+      color: var(--accent-2);
+    }
+
+    .icon-button {
+      width: 34px;
+      min-width: 34px;
+      padding: 0;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 10px;
+      margin: 10px 0;
+      -webkit-app-region: no-drag;
+    }
+
+    .panel {
+      border-radius: 18px;
+      padding: 13px;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .progress-label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 11px;
+    }
+
+    .progress-label strong {
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .bar {
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(69, 78, 91, 0.13);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #24776c, #d18442);
+      transition: width 180ms ease;
+    }
+
+    .quick-add {
+      display: grid;
+      grid-template-columns: 1fr 98px 78px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(42, 49, 60, 0.14);
+      border-radius: 999px;
+      min-height: 38px;
+      padding: 0 13px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: rgba(36, 119, 108, 0.55);
+      box-shadow: 0 0 0 3px rgba(36, 119, 108, 0.12);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: start;
+      -webkit-app-region: no-drag;
+    }
+
+    .day {
+      --tone: #24776c;
+      position: relative;
+      min-height: 116px;
+      border-radius: 18px;
+      padding: 12px;
+      overflow: hidden;
+      box-shadow: var(--soft-shadow);
+    }
+
+    .day::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--tone);
+      opacity: 0.88;
+    }
+
+    .day.today {
+      border-color: rgba(36, 119, 108, 0.42);
+      box-shadow: 0 16px 42px rgba(36, 119, 108, 0.16);
+    }
+
+    .day[data-tone="amber"] {
+      --tone: #d18442;
+    }
+
+    .day[data-tone="blue"] {
+      --tone: #496fb8;
+    }
+
+    .day[data-tone="rose"] {
+      --tone: #bd566d;
+    }
+
+    .day[data-tone="violet"] {
+      --tone: #745bb7;
+    }
+
+    .day[data-tone="cyan"] {
+      --tone: #2f7f98;
+    }
+
+    .day[data-tone="olive"] {
+      --tone: #6f8739;
+    }
+
+    .day h2 {
+      margin: 0 0 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 800;
+    }
+
+    .day-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .day-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--tone);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone) 16%, transparent);
+    }
+
+    .today-badge {
+      color: var(--accent);
+      background: rgba(36, 119, 108, 0.12);
+      border: 1px solid rgba(36, 119, 108, 0.16);
+      border-radius: 999px;
+      padding: 2px 7px;
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .day h2 small {
+      color: var(--quiet);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tasks {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 20px 1fr 24px 24px;
+      gap: 8px;
+      align-items: start;
+      padding: 8px;
+      border: 1px solid rgba(42, 49, 60, 0.10);
+      border-radius: 12px;
+      background: var(--task-bg);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.52) inset;
+      cursor: grab;
+      transition: opacity 130ms ease, transform 130ms ease, border-color 130ms ease, background 130ms ease;
+    }
+
+    .task:active {
+      cursor: grabbing;
+    }
+
+    .task.dragging {
+      opacity: 0.45;
+      transform: scale(0.985);
+    }
+
+    .task.drag-target {
+      border-color: color-mix(in srgb, var(--tone) 52%, transparent);
+      background: color-mix(in srgb, var(--tone) 13%, rgba(255, 255, 255, 0.74));
+    }
+
+    .task input[type="checkbox"] {
+      min-height: auto;
+      width: 17px;
+      height: 17px;
+      margin: 2px 0 0;
+      accent-color: var(--tone);
+      cursor: pointer;
+    }
+
+    .task label {
+      line-height: 1.42;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+      cursor: text;
+    }
+
+    .task.done label {
+      color: var(--done);
+      text-decoration: line-through;
+    }
+
+    .task.editing {
+      cursor: default;
+    }
+
+    .task.editing label,
+    .task.editing .edit {
+      display: none;
+    }
+
+    .edit-input {
+      min-height: 26px;
+      padding: 0 8px;
+      border-radius: 8px;
+      font-size: 14px;
+      background: rgba(255, 255, 255, 0.86);
+    }
+
+    .edit,
+    .delete {
+      width: 24px;
+      min-height: 24px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--quiet);
+      box-shadow: none;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .edit:hover {
+      color: var(--accent);
+      background: rgba(36, 119, 108, 0.10);
+      transform: none;
+    }
+
+    .delete:hover {
+      color: var(--accent-2);
+      background: rgba(194, 86, 109, 0.10);
+      transform: none;
+    }
+
+    .empty {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px dashed rgba(42, 49, 60, 0.16);
+      border-radius: 12px;
+      padding: 0 10px;
+      background: rgba(255, 255, 255, 0.34);
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        width: min(100% - 18px, 860px);
+      }
+
+      header,
+      .summary,
+      .quick-add {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        justify-content: flex-start;
+        max-width: none;
+      }
+
+      .desktop-window-controls {
+        justify-content: flex-start;
+      }
+
+      .board {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <div class="eyebrow" id="todayText">今天</div>
+        <h1>每周任务</h1>
+        <div class="week" id="weekText"></div>
+      </div>
+      <div class="actions">
+        <div class="desktop-window-controls">
+          <button type="button" class="icon-button" id="pinBtn" title="置顶窗口" aria-label="置顶窗口">&#8963;</button>
+          <button type="button" class="icon-button" id="minimizeBtn" title="最小化" aria-label="最小化">&minus;</button>
+          <button type="button" class="icon-button danger" id="closeBtn" title="关闭" aria-label="关闭">&times;</button>
+        </div>
+        <button type="button" id="exportBtn">导出</button>
+        <button type="button" class="danger" id="clearDoneBtn">清除完成</button>
+        <button type="button" class="danger" id="resetBtn">清空</button>
+      </div>
+    </header>
+
+    <section class="summary">
+      <div class="panel">
+        <div class="progress-label">
+          <span>完成进度</span>
+          <strong id="progressText">0 / 0</strong>
+        </div>
+        <div class="bar" aria-hidden="true"><span id="progressBar"></span></div>
+      </div>
+
+      <form class="panel quick-add" id="taskForm">
+        <input id="taskInput" type="text" placeholder="添加一个任务" autocomplete="off">
+        <select id="daySelect" aria-label="选择星期"></select>
+        <button class="primary" type="submit">添加</button>
+      </form>
+    </section>
+
+    <section class="board" id="board" aria-label="每周任务列表"></section>
+  </main>
+
+  <script>
+    const days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+    const tones = ["green", "amber", "blue", "rose", "violet", "cyan", "olive"];
+    const storageKey = "weekly-todo-v1";
+
+    const defaultTasks = {
+      "周一": ["规划本周重点", "处理上周遗留事项"],
+      "周二": [],
+      "周三": ["检查本周进度"],
+      "周四": [],
+      "周五": ["整理周总结", "安排下周待办"],
+      "周六": [],
+      "周日": ["休息与复盘"]
+    };
+
+    const $ = (selector) => document.querySelector(selector);
+    const board = $("#board");
+    const daySelect = $("#daySelect");
+    let tasks = load();
+    let draggedTaskId = null;
+    let editingTaskId = null;
+
+    function createId() {
+      return crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function load() {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed.filter(task => task && task.text);
+        } catch {
+          localStorage.removeItem(storageKey);
+        }
+      }
+
+      return days.flatMap(day =>
+        defaultTasks[day].map(text => ({
+          id: createId(),
+          day,
+          text,
+          done: false
+        }))
+      );
+    }
+
+    function save() {
+      localStorage.setItem(storageKey, JSON.stringify(tasks));
+    }
+
+    function todayIndex() {
+      return (new Date().getDay() + 6) % 7;
+    }
+
+    function renderWeek() {
+      const now = new Date();
+      const dayIndex = todayIndex();
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dayIndex);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fmt = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" });
+      $("#weekText").textContent = `${fmt.format(monday)} - ${fmt.format(sunday)}`;
+      $("#todayText").textContent = `${days[dayIndex]} · 今天`;
+    }
+
+    function renderOptions() {
+      daySelect.innerHTML = days.map(day => `<option value="${day}">${day}</option>`).join("");
+      daySelect.value = days[todayIndex()];
+    }
+
+    function swapTasks(sourceId, targetId) {
+      if (!sourceId || !targetId || sourceId === targetId) return;
+
+      const sourceIndex = tasks.findIndex(task => task.id === sourceId);
+      const targetIndex = tasks.findIndex(task => task.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0) return;
+      if (tasks[sourceIndex].day !== tasks[targetIndex].day) return;
+
+      [tasks[sourceIndex], tasks[targetIndex]] = [tasks[targetIndex], tasks[sourceIndex]];
+      save();
+      render();
+    }
+
+    function clearDragState() {
+      document.querySelectorAll(".task.dragging, .task.drag-target").forEach(element => {
+        element.classList.remove("dragging", "drag-target");
+      });
+      draggedTaskId = null;
+    }
+
+    function attachDragHandlers(item, task) {
+      if (task.id === editingTaskId) {
+        item.draggable = false;
+        return;
+      }
+
+      item.draggable = true;
+      item.dataset.taskId = task.id;
+
+      item.addEventListener("dragstart", event => {
+        draggedTaskId = task.id;
+        item.classList.add("dragging");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", task.id);
+      });
+
+      item.addEventListener("dragend", clearDragState);
+
+      item.addEventListener("dragover", event => {
+        if (!draggedTaskId || draggedTaskId === task.id) return;
+        const sourceTask = tasks.find(existing => existing.id === draggedTaskId);
+        if (!sourceTask || sourceTask.day !== task.day) return;
+
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        item.classList.add("drag-target");
+      });
+
+      item.addEventListener("dragleave", () => {
+        item.classList.remove("drag-target");
+      });
+
+      item.addEventListener("drop", event => {
+        event.preventDefault();
+        item.classList.remove("drag-target");
+        swapTasks(draggedTaskId || event.dataTransfer.getData("text/plain"), task.id);
+      });
+    }
+
+    function stopTaskDrag(element) {
+      ["pointerdown", "mousedown", "dragstart"].forEach(eventName => {
+        element.addEventListener(eventName, event => {
+          event.stopPropagation();
+          if (eventName === "dragstart") event.preventDefault();
+        });
+      });
+    }
+
+    function startEdit(task) {
+      editingTaskId = task.id;
+      render();
+      requestAnimationFrame(() => {
+        const input = document.querySelector(`[data-editing-id="${task.id}"]`);
+        input?.focus();
+        input?.select();
+      });
+    }
+
+    function finishEdit(task, input, shouldSave = true) {
+      if (editingTaskId !== task.id) return;
+
+      if (shouldSave) {
+        const cleanText = input.value.trim();
+        if (cleanText) {
+          task.text = cleanText;
+          save();
+        }
+      }
+
+      editingTaskId = null;
+      render();
+    }
+
+    function render() {
+      board.innerHTML = "";
+      const currentDay = days[todayIndex()];
+
+      days.forEach((day, index) => {
+        const dayTasks = tasks.filter(task => task.day === day);
+        const doneCount = dayTasks.filter(task => task.done).length;
+        const section = document.createElement("article");
+        section.className = `day${day === currentDay ? " today" : ""}`;
+        section.dataset.tone = tones[index];
+        section.innerHTML = `
+          <h2>
+            <span class="day-title">
+              <span class="day-dot" aria-hidden="true"></span>
+              <span>${day}</span>
+              ${day === currentDay ? '<em class="today-badge">今天</em>' : ""}
+            </span>
+            <small>${doneCount}/${dayTasks.length}</small>
+          </h2>
+          ${dayTasks.length ? '<ul class="tasks"></ul>' : '<div class="empty">暂无任务</div>'}
+        `;
+
+        const list = section.querySelector(".tasks");
+        dayTasks.forEach(task => {
+          const item = document.createElement("li");
+          const isEditing = task.id === editingTaskId;
+          item.className = `task${task.done ? " done" : ""}${isEditing ? " editing" : ""}`;
+          item.innerHTML = `
+            <input type="checkbox" ${task.done ? "checked" : ""} aria-label="完成任务" draggable="false">
+            <label></label>
+            <button type="button" class="edit" title="编辑任务" aria-label="编辑任务" draggable="false">&#9998;</button>
+            <button type="button" class="delete" title="删除任务" aria-label="删除任务" draggable="false">&times;</button>
+          `;
+          attachDragHandlers(item, task);
+          const label = item.querySelector("label");
+          label.textContent = task.text;
+          label.title = "双击编辑任务";
+          label.addEventListener("dblclick", () => startEdit(task));
+
+          if (isEditing) {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.className = "edit-input";
+            input.value = task.text;
+            input.dataset.editingId = task.id;
+            input.setAttribute("aria-label", "编辑任务内容");
+            input.setAttribute("draggable", "false");
+            label.replaceWith(input);
+            stopTaskDrag(input);
+            input.addEventListener("keydown", event => {
+              if (event.key === "Enter") finishEdit(task, input, true);
+              if (event.key === "Escape") finishEdit(task, input, false);
+            });
+            input.addEventListener("input", () => {
+              const cleanText = input.value.trim();
+              if (!cleanText) return;
+              task.text = cleanText;
+              save();
+            });
+            input.addEventListener("blur", () => finishEdit(task, input, true));
+          }
+
+          const checkbox = item.querySelector('input[type="checkbox"]');
+          stopTaskDrag(checkbox);
+          checkbox.addEventListener("change", event => {
+            task.done = event.target.checked;
+            save();
+            render();
+          });
+
+          const editButton = item.querySelector(".edit");
+          stopTaskDrag(editButton);
+          editButton.addEventListener("click", () => startEdit(task));
+
+          const deleteButton = item.querySelector(".delete");
+          stopTaskDrag(deleteButton);
+          deleteButton.addEventListener("click", () => {
+            tasks = tasks.filter(existing => existing.id !== task.id);
+            save();
+            render();
+          });
+          list.appendChild(item);
+        });
+
+        board.appendChild(section);
+      });
+
+      renderProgress();
+    }
+
+    function renderProgress() {
+      const total = tasks.length;
+      const done = tasks.filter(task => task.done).length;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+      $("#progressText").textContent = `${done} / ${total}`;
+      $("#progressBar").style.width = `${percent}%`;
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      return Promise.resolve();
+    }
+
+    $("#taskForm").addEventListener("submit", event => {
+      event.preventDefault();
+      const text = $("#taskInput").value.trim();
+      if (!text) return;
+
+      tasks.push({
+        id: createId(),
+        day: daySelect.value,
+        text,
+        done: false
+      });
+      $("#taskInput").value = "";
+      save();
+      render();
+    });
+
+    $("#clearDoneBtn").addEventListener("click", () => {
+      tasks = tasks.filter(task => !task.done);
+      save();
+      render();
+    });
+
+    $("#resetBtn").addEventListener("click", () => {
+      if (!confirm("确定要清空本周所有任务吗？")) return;
+      tasks = [];
+      save();
+      render();
+    });
+
+    $("#exportBtn").addEventListener("click", async () => {
+      const text = days.map(day => {
+        const dayTasks = tasks.filter(task => task.day === day);
+        const lines = dayTasks.length
+          ? dayTasks.map(task => `${task.done ? "[x]" : "[ ]"} ${task.text}`)
+          : ["无"];
+        return `${day}\n${lines.join("\n")}`;
+      }).join("\n\n");
+
+      await copyText(text);
+      alert("已复制到剪贴板");
+    });
+
+    if (window.desktopWidget) {
+      document.body.classList.add("electron-widget");
+      $("#minimizeBtn").addEventListener("click", () => window.desktopWidget.minimize());
+      $("#closeBtn").addEventListener("click", () => window.desktopWidget.close());
+      $("#pinBtn").addEventListener("click", async () => {
+        const isPinned = await window.desktopWidget.toggleAlwaysOnTop();
+        $("#pinBtn").classList.toggle("primary", isPinned);
+      });
+    }
+
+    renderWeek();
+    renderOptions();
+    render();
+  </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ npm-debug.log*
 
 # Local screenshots generated while polishing the widget.
 weekly-widget-preview*.png
+download-test/
+one-click-test/
 
 # OS/editor noise.
 .DS_Store

@@ -41,7 +41,46 @@ npm --version
 git --version
 ```
 
-## 安装
+## 一键安装（推荐）
+
+在 PowerShell 中运行这一行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget/main/install.ps1 | iex"
+```
+
+它会自动完成：
+
+- 下载最新项目代码
+- 检查 Node.js / npm
+- 如果没有 Node.js，会尝试通过 `winget` 安装 Node.js LTS
+- 安装 Electron 依赖
+- 创建桌面快捷方式
+- 启动小组件
+
+默认安装位置：
+
+```text
+%LOCALAPPDATA%\Programs\WeeklyTodoWidget
+```
+
+安装完成后，桌面会出现：
+
+```text
+每周任务代办-透明小组件.lnk
+```
+
+以后双击它就能打开小组件。
+
+## 一键卸载
+
+在 PowerShell 中运行：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget/main/uninstall.ps1 | iex"
+```
+
+## 开发者手动安装
 
 克隆仓库：
 
@@ -73,7 +112,7 @@ npm start
 
 如果依赖还没有安装，`start-widget.ps1` 会先自动执行 `npm install`。
 
-## 创建桌面快捷方式
+## 手动创建桌面快捷方式
 
 在项目根目录运行：
 
@@ -150,6 +189,8 @@ npm start
 │  └─ package-lock.json
 ├─ start-widget.ps1              # 从项目根目录启动小组件
 ├─ install-desktop-shortcut.ps1   # 创建桌面快捷方式
+├─ install.ps1                    # 一键安装脚本
+├─ uninstall.ps1                  # 一键卸载脚本
 ├─ assets/
 │  └─ preview.png                # README 预览图
 ├─ README.md
@@ -166,7 +207,7 @@ npm start --prefix weekly-widget
 
 如果窗口已经打开，关闭后再启动即可看到新效果。
 
-Electron 默认优先加载桌面上的 `每周任务代办.html`；如果找不到，就加载项目里的 `weekly-todo.html`。
+Electron 会加载项目目录里的 `weekly-todo.html`。如果你修改了这个文件，重启小组件即可看到新效果。
 
 ## 常见问题
 
@@ -233,7 +274,44 @@ npm --version
 git --version
 ```
 
-## Installation
+## One-Line Install (Recommended)
+
+Run this command in PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget/main/install.ps1 | iex"
+```
+
+It will automatically:
+
+- Download the latest project source
+- Check Node.js / npm
+- Try to install Node.js LTS via `winget` if Node.js is missing
+- Install Electron dependencies
+- Create a desktop shortcut
+- Start the widget
+
+Default install path:
+
+```text
+%LOCALAPPDATA%\Programs\WeeklyTodoWidget
+```
+
+After installation, you will see this desktop shortcut:
+
+```text
+每周任务代办-透明小组件.lnk
+```
+
+## One-Line Uninstall
+
+Run this in PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ShuoFeng-n/meizhou-renwu-daiban-weekly-todo-widget/main/uninstall.ps1 | iex"
+```
+
+## Manual Installation for Developers
 
 Clone the repository:
 
@@ -265,7 +343,7 @@ Or run from the project root:
 
 If dependencies are missing, `start-widget.ps1` will run `npm install` first.
 
-## Create Desktop Shortcut
+## Create Desktop Shortcut Manually
 
 From the project root:
 
@@ -331,6 +409,8 @@ That means:
 │  └─ package-lock.json
 ├─ start-widget.ps1
 ├─ install-desktop-shortcut.ps1
+├─ install.ps1
+├─ uninstall.ps1
 ├─ assets/
 │  └─ preview.png
 ├─ README.md
@@ -345,7 +425,7 @@ After editing `weekly-todo.html`, restart the widget:
 npm start --prefix weekly-widget
 ```
 
-Electron first tries to load `每周任务代办.html` from the desktop. If it does not exist, it loads the local `weekly-todo.html` from this repository.
+Electron loads `weekly-todo.html` from the project directory. Restart the widget after editing the file.
 
 ## Roadmap Ideas
 

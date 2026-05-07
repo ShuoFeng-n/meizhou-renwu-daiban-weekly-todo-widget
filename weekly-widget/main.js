@@ -1,10 +1,7 @@
 const { app, BrowserWindow, ipcMain, screen } = require("electron");
-const fs = require("fs");
-const os = require("os");
 const path = require("path");
 
-const desktopHtml = path.join(os.homedir(), "Desktop", "每周任务代办.html");
-const fallbackHtml = path.join(__dirname, "..", "weekly-todo.html");
+const widgetHtml = path.join(__dirname, "..", "weekly-todo.html");
 
 let widgetWindow;
 let alwaysOnTop = false;
@@ -38,7 +35,7 @@ function createWidgetWindow() {
   });
 
   widgetWindow.setMenuBarVisibility(false);
-  widgetWindow.loadFile(fs.existsSync(desktopHtml) ? desktopHtml : fallbackHtml);
+  widgetWindow.loadFile(widgetHtml);
   widgetWindow.once("ready-to-show", () => widgetWindow.show());
   widgetWindow.on("closed", () => {
     widgetWindow = null;
